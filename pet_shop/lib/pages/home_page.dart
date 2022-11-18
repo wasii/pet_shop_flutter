@@ -9,6 +9,7 @@ import 'package:pet_shop/models/category_model.dart';
 import 'package:pet_shop/models/product_model.dart';
 
 import '../widgets/categories.dart';
+import '../widgets/product_items.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,16 +33,28 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+  Future<void> getProducts() async {
+    final String response =
+        await rootBundle.loadString('assets/json/product.json');
+    final data = json.decode(response);
+    setState(() {
+      for (var element in data['product']) {
+        dataProduct.add(ProductModel.fromJson(element));
+      }
+    });
+  }
 
   @override
   void initState() {
     getCategory();
+    getProducts();
     super.initState();
   }
 
   @override
   void dispose() {
     getCategory();
+    getProducts();
     super.dispose();
   }
 
@@ -147,9 +160,48 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Best Seller",
+                  style: poppin.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: black,
+                  ),
+                ),
+                Text(
+                  "See All",
+                  style: poppin.copyWith(
+                    fontSize: 14,
+                    color: deepPurple,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                dataProduct.length,
+                (index) => Padding(
+                  padding: index == 0
+                      ? EdgeInsets.only(left: 20, right: 20)
+                      : EdgeInsets.only(right: 20),
+                  child: ProductItem(
+                    product: dataProduct[index],
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
   }
 }
-
